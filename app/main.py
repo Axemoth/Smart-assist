@@ -13,8 +13,10 @@ from app.utlis.rate_limiter import TokenBucketLimiter
 
 app = FastAPI()
 
-# Mount static files directory
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Resolve absolute static directory path (compatible with Vercel serverless)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+static_dir = os.path.join(BASE_DIR, "static")
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 Base.metadata.create_all(bind=engine)
 
@@ -38,11 +40,11 @@ app.add_middleware(TokenBucketLimiter, bucket_size=10, refill_rate=1.0)
 # Serve root SPA frontend
 @app.get("/", response_class=HTMLResponse)
 def read_root():
-    index_path = os.path.join("static", "index.html")
+    index_path = os.path.join(static_dir, "index.html")
     if os.path.exists(index_path):
         with open(index_path, "r", encoding="utf-8") as f:
             return HTMLResponse(content=f.read())
-    return HTMLResponse(content="<h1>Frontend index.html not found!</h1>", status_code=404)
+    return HTMLResponse(content=f"<h1>Frontend index.html not found! Path: {index_path}</h1>", status_code=404)
 
 
 app.include_router(auth.router, prefix="/auth", tags=["Auth Endpoints"])
