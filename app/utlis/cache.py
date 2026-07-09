@@ -2,9 +2,12 @@ import redis
 from app.core.config import settings
 
 # decode_responses=True ensures we get strings/ints back instead of bytes
-redis_client = redis.Redis(
-    host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True
-)
+if settings.REDIS_URL:
+    redis_client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=True)
+else:
+    redis_client = redis.Redis(
+        host=settings.REDIS_HOST, port=settings.REDIS_PORT, decode_responses=True
+    )
 
 
 def get_failed_attempts(key: str) -> int:
