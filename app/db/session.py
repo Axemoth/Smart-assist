@@ -3,10 +3,12 @@ from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
 db_url = settings.DATABASE_URL
+
+# Vercel/Heroku sometimes use "postgres://" which SQLAlchemy 2.0 doesn't accept
 if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
+    db_url = db_url.replace("postgres://", "postgresql+psycopg2://", 1)
 elif db_url.startswith("postgresql://"):
-    db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 connect_args = {}
 if db_url.startswith("sqlite"):
