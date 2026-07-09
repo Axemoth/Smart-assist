@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Assisted ToDo Dashboard</title>
+    <!-- Google Fonts: Inter & Outfits -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="stars-container"></div>
+    <div class="glow-bg"></div>
+
+    <div class="container">
+        <!-- Auth Section -->
+        <div id="auth-section" class="auth-card glass-panel fade-in">
+            <h1 class="brand-title"><i class="fa-solid fa-wand-magic-sparkles magic-icon"></i> Smart Assist</h1>
+            <p class="brand-subtitle">Intelligent workflow optimization and task scheduling</p>
+
+            <div class="tab-buttons">
+                <button id="login-tab-btn" class="tab-btn active" onclick="switchAuthTab('login')">Login</button>
+                <button id="register-tab-btn" class="tab-btn" onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="login-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                    <input type="email" id="login-email" required placeholder="name@example.com">
+                </div>
+                <div class="input-group">
+                    <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn primary-btn"><span class="btn-text">Sign In</span> <i class="fa-solid fa-arrow-right"></i></button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <label for="register-name"><i class="fa-solid fa-user"></i> Full Name</label>
+                    <input type="text" id="register-name" required placeholder="John Doe">
+                </div>
+                <div class="input-group">
+                    <label for="register-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+                    <input type="email" id="register-email" required placeholder="name@example.com">
+                </div>
+                <div class="input-group">
+                    <label for="register-password"><i class="fa-solid fa-lock"></i> Password</label>
+                    <input type="password" id="register-password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn secondary-btn"><span class="btn-text">Create Account</span> <i class="fa-solid fa-user-plus"></i></button>
+            </form>
+            
+            <div id="auth-message" class="alert-message hidden"></div>
+        </div>
+
+        <!-- App Dashboard Section (Hidden by default) -->
+        <div id="dashboard-section" class="hidden fade-in">
+            <header class="app-header glass-panel">
+                <div class="header-brand">
+                    <h2><i class="fa-solid fa-circle-check brand-logo-icon"></i> Tasks</h2>
+                </div>
+                <div class="header-user">
+                    <span id="user-display-email"><i class="fa-solid fa-user"></i> user@example.com</span>
+                    <button class="logout-btn" onclick="handleLogout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+                </div>
+            </header>
+
+            <main class="dashboard-grid">
+                <!-- Left Panel: Create Task & AI Prompter -->
+                <div class="panel-left">
+                    <!-- AI Assist Panel -->
+                    <div class="glass-panel input-card">
+                        <h3><i class="fa-solid fa-wand-magic-sparkles purple-glow"></i> AI Quick-Parse</h3>
+                        <p class="panel-desc">Type naturally. DeepSeek will auto-generate title, details, and priority.</p>
+                        <form id="ai-parse-form" onsubmit="handleAIParse(event)">
+                            <div class="input-group">
+                                <textarea id="ai-prompt-input" rows="2" placeholder="e.g. call David tomorrow at 3 PM to fix bug high priority" required></textarea>
+                            </div>
+                            <button type="submit" id="ai-parse-submit" class="btn ai-btn">
+                                <span class="btn-text"><i class="fa-solid fa-brain"></i> Parse with DeepSeek</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Manual Task Creation Form -->
+                    <div class="glass-panel input-card">
+                        <h3 id="form-title">Create New Task</h3>
+                        <form id="task-form" onsubmit="handleSaveTask(event)">
+                            <input type="hidden" id="edit-task-id">
+                            <div class="input-group">
+                                <label for="task-title">Task Title</label>
+                                <input type="text" id="task-title" required placeholder="Task title">
+                            </div>
+                            <div class="input-group">
+                                <label for="task-desc">Description</label>
+                                <textarea id="task-desc" rows="3" placeholder="Task description..."></textarea>
+                            </div>
+                            <div class="input-group-row">
+                                <div class="input-group-half">
+                                    <label for="task-priority">Priority</label>
+                                    <select id="task-priority">
+                                        <option value="low">Low Priority</option>
+                                        <option value="medium" selected>Medium Priority</option>
+                                        <option value="high">High Priority</option>
+                                    </select>
+                                </div>
+                                <div class="input-group-half">
+                                    <label for="task-status">Status</label>
+                                    <select id="task-status">
+                                        <option value="pending" selected>Pending</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" id="cancel-edit-btn" class="btn hidden" onclick="resetTaskForm()">Cancel</button>
+                                <button type="submit" id="save-task-btn" class="btn primary-btn">Save Task</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Tasks List -->
+                <div class="panel-right">
+                    <div class="glass-panel task-list-card">
+                        <div class="list-header">
+                            <h3><i class="fa-solid fa-list-check"></i> My ToDo List</h3>
+                            <div class="filter-controls">
+                                <button id="filter-all" class="filter-btn active" onclick="setFilter('all')">All</button>
+                                <button id="filter-pending" class="filter-btn" onclick="setFilter('pending')">Pending</button>
+                                <button id="filter-completed" class="filter-btn" onclick="setFilter('completed')">Completed</button>
+                            </div>
+                        </div>
+
+                        <div id="tasks-container" class="tasks-container">
+                            <!-- Tasks will be rendered dynamically here -->
+                            <div class="loading-state">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Loading tasks...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- AI Subtask Checklist Modal -->
+    <div id="subtask-modal" class="modal hidden">
+        <div class="modal-content glass-panel fade-in">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-network-wired"></i> Task Breakdown Checklist</h3>
+                <button class="close-modal-btn" onclick="closeSubtaskModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-task-title" class="modal-task-title">Task Title</p>
+                <p id="modal-task-desc" class="modal-task-desc">Task description goes here.</p>
+                
+                <div class="subtask-list-title">Generated Subtasks:</div>
+                <div id="modal-subtasks-container" class="modal-subtasks-container">
+                    <!-- Subtasks rendered here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary-btn" onclick="closeSubtaskModal()">Close</button>
+                <button class="btn primary-btn" onclick="addSubtasksToDescription()">Append to Task Description</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

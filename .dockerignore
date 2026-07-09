@@ -1,0 +1,19 @@
+# Git
+.git
+.gitignore
+
+# Python artifacts
+__pycache__/
+.pytest_cache/
+.venv/
+.env
+
+# Project specific
+app.log
+*.db
+*.sqlite3
+
+
+# Docker/IDE
+Dockerfile
+.dockerignore
